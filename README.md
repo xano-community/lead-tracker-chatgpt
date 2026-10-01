@@ -1,12 +1,12 @@
-# Lead Tracker for ChatGPT
+# Lead Tracker ChatGPT Plugin
 
-A small CRM that runs inside ChatGPT as an app, with everything behind it on Xano: the `lead` table, the tool logic, the MCP server ChatGPT connects to, and the REST API a web board uses. Add and move leads by chatting, or drag them through New → Qualified → Proposal → Won on a live board.
+A ChatGPT plugin (plug-in) for tracking sales leads, with an interactive panel inside the chat and everything behind it on Xano: the `lead` table, the tool logic, the MCP server ChatGPT connects to, and the REST API a web board uses. Add and move leads by chatting, or move them through New → Qualified → Proposal → Won on a live board. Use it as a working starting point for building your own ChatGPT plugin on Xano.
 
 ## Why this exists
 
-Putting your own data inside ChatGPT usually means standing up an MCP server, a database, a hosted UI for the in-chat panel, and glue code to keep them in sync. For something as simple as a lead list, that's a lot of moving parts before anyone can say "add Maya from Northwind, $4,800."
+ChatGPT plugins can now show app-like interactive panels next to the conversation, not just return text. Building one with your own data usually means standing up an MCP server, a database, a hosted UI for the panel, and glue code to keep them in sync. For something as simple as a lead list, that's a lot of moving parts before anyone can say "add Maya from Northwind, $4,800."
 
-This template collapses it into one Xano workspace. The `lead` table holds the data, four AI tools (`open_lead_tracker`, `list_leads`, `add_lead`, `update_lead_stage`) do the work, and a Xano MCP server exposes them to ChatGPT along with an in-chat board panel. The same functions back a REST API and a single-file web board, so the chat and the browser always show the same leads. Fork it as a working example of a ChatGPT app on Xano, then swap the lead model for your own.
+This template collapses it into one Xano workspace. The `lead` table holds the data, four AI tools (`open_lead_tracker`, `list_leads`, `add_lead`, `update_lead_stage`) do the work, and a Xano MCP server exposes them to ChatGPT as a plugin, along with an interactive board panel. The same functions back a REST API and a single-file web board, so the chat and the browser always show the same leads. Fork it as a working example of a ChatGPT plugin with a real backend, then swap the lead model for your own.
 
 ## How it works
 
@@ -22,7 +22,7 @@ Browser ──REST──▶ api:LeadTracker  (GET/POST /leads, PATCH /leads/{id}
 ```
 
 - **One code path.** The tools and the REST endpoints are thin wrappers over `leads/list`, `leads/add`, and `leads/move_stage`, so validation and error messages are identical wherever a lead is written.
-- **In-chat panel.** `open_lead_tracker` carries an output template, so ChatGPT renders the board inline. Use ChatGPT's "open in tab" control to show it next to the chat; the panel switches to a full-height layout in fullscreen.
+- **Interactive panel.** `open_lead_tracker` carries an output template, so ChatGPT renders the board inline as the plugin's interactive panel. Use ChatGPT's "open in tab" control to show it next to the chat; the panel switches to a full-height layout in fullscreen.
 - **Live sync.** The panel re-reads `list_leads` every 2 seconds while visible, and the web board re-reads `GET /leads` every 5 seconds. A lead added or moved from either side shows up on the other, marked "Saved to Xano".
 - **Text-only writes.** `add_lead` and `update_lead_stage` have no output template, so ChatGPT replies in a sentence and the open panel updates itself.
 - **Panel hosting.** The `lead_tracker_panel` resource fetches `frontend/panel.html` from `PANEL_URL`. If you don't set it, it uses this repository's public copy on GitHub.
@@ -30,8 +30,8 @@ Browser ──REST──▶ api:LeadTracker  (GET/POST /leads, PATCH /leads/{id}
 ## Common use cases
 
 - **A founder or small sales team** tracking a handful of deals by talking to ChatGPT ("move Leo to Qualified", "what's in Proposal?") instead of opening a CRM.
-- **A developer evaluating ChatGPT apps** who wants a complete, working MCP server + in-chat UI on Xano to read and extend.
-- **An agency building a client-facing ChatGPT app** that needs a real database and REST API behind the chat, starting from a pattern that already keeps the two in sync.
+- **A developer learning how to build a ChatGPT plugin** who wants a complete, working MCP server, AI tools, and interactive panel on Xano to read and extend.
+- **An agency building a client-facing ChatGPT plugin** that needs a real database and REST API behind the chat, starting from a pattern that already keeps the two in sync.
 
 ## Quick start
 
@@ -46,9 +46,9 @@ Browser ──REST──▶ api:LeadTracker  (GET/POST /leads, PATCH /leads/{id}
    ```
    The group slug is the part after `api:` in the LeadTracker API group's base URL in Xano.
 3. **Open the web board.** Open `frontend/index.html` in a browser, enter your instance URL (and the LeadTracker group slug if asked). Or skip step 2 and press **Load demo data** there.
-4. **Connect ChatGPT.**
-   1. In ChatGPT, turn on developer mode and add a custom app that points at your MCP server's stream URL (find it on the **Lead Tracker** MCP server in Xano), with no authentication.
-   2. Ask "open my lead tracker". After any change to tools or the panel, open the app's settings and refresh its tools.
+4. **Add the plugin to ChatGPT.**
+   1. In ChatGPT, turn on developer mode, go to **Settings → Plugins**, and add a plugin that points at your MCP server's stream URL (find it on the **Lead Tracker** MCP server in Xano), with no authentication.
+   2. Ask "open my lead tracker". After any change to tools or the panel, open the plugin's settings and click **Refresh tools**.
    3. ChatGPT caches the panel by its resource URI (`ui://lead-tracker/panel-v1.html`). If an old panel keeps showing after you change it, bump the version in both `lead_tracker.xs` and `lead_tracker_panel.xs`.
 5. **Optional: host the panel yourself.** If you edit the panel, rebuild it (`cd panel && npm install && npm run build`, which writes `frontend/panel.html`), publish that file anywhere public (Xano static hosting works), and set the workspace environment variable `PANEL_URL` to its URL.
 
