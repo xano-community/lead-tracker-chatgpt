@@ -1,0 +1,45 @@
+/* Lead Tracker panel. Uses the host's theme variables from @openai/mcp-extensions styles. */
+:root { --xano: #3b6cf6; --xano-soft: color-mix(in srgb, #3b6cf6 14%, transparent); --ok: #16a34a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif); font-size: 14px; }
+.lt { padding: 16px; display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+.lt-head { display: flex; align-items: center; gap: 12px; }
+.lt-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.lt-sub { color: var(--muted-foreground); font-size: 13px; margin-top: 2px; }
+.lt-spacer { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--xano-soft); color: var(--xano); white-space: nowrap; }
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--xano); display: inline-block; }
+.iconbtn { border: 1px solid var(--input); background: transparent; color: var(--foreground); border-radius: 999px; height: 30px; padding: 0 12px; font: inherit; font-size: 13px; cursor: var(--cursor-interaction, pointer); }
+.iconbtn:disabled { opacity: .5; }
+.board { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; }
+.col { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px; min-height: 180px; display: flex; flex-direction: column; gap: 8px; }
+.col-h { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; padding: 2px 2px 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.count { margin-left: auto; color: var(--muted-foreground); font-weight: 500; font-size: 12px; background: var(--muted); border-radius: 999px; padding: 1px 8px; }
+.card { background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 10px 11px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 2px rgb(0 0 0 / 5%); transition: border-color .2s; }
+.card.saving { border-style: dashed; }
+.card.just-saved { border-color: color-mix(in srgb, var(--ok) 55%, transparent); }
+.card-top { display: flex; align-items: center; gap: 8px; }
+.av { width: 28px; height: 28px; border-radius: 50%; background: var(--xano-soft); color: var(--xano); font-weight: 600; font-size: 11px; display: grid; place-items: center; flex: none; }
+.nm { font-weight: 600; font-size: 14px; line-height: 1.2; }
+.co { color: var(--muted-foreground); font-size: 12.5px; line-height: 1.2; }
+.val { font-weight: 600; font-variant-numeric: tabular-nums; font-size: 14px; }
+.card-foot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground); }
+.card-foot.ok { color: var(--ok); }
+.card select { margin-left: auto; font: inherit; font-size: 12px; border: 1px solid var(--input); border-radius: 8px; background: var(--background); color: var(--foreground); padding: 2px 4px; cursor: var(--cursor-interaction, pointer); }
+.spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--muted); border-top-color: var(--xano); animation: s .8s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+.empty { grid-column: 1 / -1; text-align: center; color: var(--muted-foreground); padding: 8px 0 0; font-size: 13px; }
+.err { color: var(--destructive); font-size: 12.5px; }
+.foot { color: var(--muted-foreground); font-size: 12px; display: flex; gap: 6px; align-items: center; }
+@media (max-width: 560px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.lt.full { padding: 24px 28px; gap: 18px; }
+.lt.full .lt-title { font-size: 22px; }
+.lt.full .board { gap: 14px; }
+.lt.full .col { min-height: calc(100vh - 140px); padding: 12px; }
+.lt.full .card { padding: 12px 13px; }
+.card.just-saved { animation: pop .6s ease-out; }
+@keyframes pop { 0% { transform: scale(.96); opacity: .4; } 60% { transform: scale(1.02); opacity: 1; } 100% { transform: none; } }
+
+.ok-ico{vertical-align:-2px;margin-right:2px}

@@ -1,0 +1,397 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lead Tracker</title><style>/* Framework-free MCP App styles. */
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    --background: var(
+      --color-background-primary,
+      light-dark(rgb(255 255 255), rgb(24 24 24))
+    );
+    --foreground: var(
+      --color-text-primary,
+      light-dark(rgb(26 28 31), rgb(255 255 255))
+    );
+    --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+    --card-foreground: var(--color-text-primary, var(--foreground));
+    --primary: var(
+      --color-text-info,
+      light-dark(rgb(51 156 255), rgb(131 195 255))
+    );
+    --primary-foreground: var(
+      --color-text-inverse,
+      light-dark(rgb(255 255 255), rgb(13 13 13))
+    );
+    --secondary: var(
+      --color-background-secondary,
+      light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+    );
+    --secondary-foreground: var(--color-text-primary, var(--foreground));
+    --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+    --muted-foreground: var(
+      --color-text-secondary,
+      light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
+    );
+    --accent: var(
+      --color-background-info,
+      light-dark(rgb(229 242 255), rgb(13 39 63))
+    );
+    --accent-foreground: var(--color-text-info, var(--primary));
+    --destructive: var(
+      --color-text-warning,
+      light-dark(rgb(226 85 7), rgb(255 133 73))
+    );
+    --border: var(
+      --color-border-secondary,
+      light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+    );
+    --input: var(
+      --color-border-primary,
+      light-dark(rgb(26 28 31 / 11.8%), rgb(255 255 255 / 12%))
+    );
+    --ring: var(--color-ring-primary, var(--primary));
+    --font-size-base: var(--font-text-md-size, 14px);
+    --radius: var(--border-radius-lg, 12.5px);
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    color: var(--foreground);
+    background: var(--background);
+    font-size: max(11px, var(--font-size-base));
+    font-weight: var(--font-weight-normal, 430);
+    line-height: 1.5;
+  }
+
+  /* MCP sandboxes can force their own font on body, so restore the host font below it. */
+  body,
+  body > * {
+    font-family: var(
+      --font-sans,
+      -apple-system,
+      system-ui,
+      "Segoe UI",
+      sans-serif
+    );
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin-block: 0;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.25;
+  }
+
+  h1 {
+    font-size: calc(var(--font-size-base) * 1.7142857143);
+  }
+
+  h2 {
+    font-size: calc(var(--font-size-base) * 1.4285714286);
+  }
+
+  h3 {
+    font-size: calc(var(--font-size-base) * 1.2857142857);
+  }
+}
+
+@layer components {
+  .cursor-interaction {
+    cursor: var(--cursor-interaction, pointer);
+  }
+
+  .card {
+    min-width: 0;
+    padding: 12px;
+    overflow-wrap: break-word;
+    border-radius: calc(var(--radius) * 1.6);
+    corner-shape: superellipse(1.5);
+    color: var(--card-foreground);
+    background: var(--card);
+  }
+
+  .btn,
+  .form-check-input,
+  .form-control,
+  .form-select {
+    box-sizing: border-box;
+    font: inherit;
+  }
+
+  .btn {
+    appearance: button;
+    display: inline-flex;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    min-height: 28px;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0 8px;
+    border: 1px solid var(--input);
+    border-radius: var(--radius);
+    corner-shape: superellipse(1.5);
+    color: var(--secondary-foreground);
+    background: var(--secondary);
+    cursor: var(--cursor-interaction, pointer);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .btn:not(:disabled):hover {
+    background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+  }
+
+  .btn-primary {
+    border-color: transparent;
+    color: var(--primary-foreground);
+    background: var(--foreground);
+    background-clip: padding-box;
+  }
+
+  .btn-primary:not(:disabled):hover {
+    background: color-mix(in srgb, var(--foreground) 80%, transparent);
+    background-clip: padding-box;
+  }
+
+  .btn-ghost {
+    border-color: transparent;
+    color: var(--muted-foreground);
+    background: transparent;
+  }
+
+  .btn-ghost:not(:disabled):hover {
+    color: var(--foreground);
+    background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+  }
+
+  .btn:not(.btn-primary):is([aria-pressed="true"], [aria-selected="true"]) {
+    border-color: var(--primary);
+    color: var(--primary-foreground);
+    background: var(--primary);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .btn:disabled,
+  .form-check-input:disabled,
+  .form-control:disabled,
+  .form-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--foreground);
+  }
+
+  .form-control,
+  .form-select {
+    display: block;
+    width: 100%;
+    min-height: 28px;
+    padding: 0 8px;
+    outline: none;
+    border: 1px solid var(--input);
+    border-radius: var(--radius);
+    corner-shape: superellipse(1.5);
+    color: var(--foreground);
+    background: var(--secondary);
+  }
+
+  .form-control::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .form-select {
+    appearance: none;
+    padding-right: 32px;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+      linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+    background-position:
+      calc(100% - 14px) 50%,
+      calc(100% - 10px) 50%;
+    background-repeat: no-repeat;
+    background-size: 4px 4px;
+    cursor: var(--cursor-interaction, pointer);
+  }
+
+  .form-select:not(:disabled):hover {
+    background-color: color-mix(
+      in srgb,
+      var(--foreground) 6%,
+      var(--secondary)
+    );
+  }
+
+  textarea.form-control {
+    min-height: 72px;
+    padding: 8px 10px;
+    resize: vertical;
+  }
+
+  .form-control:focus-visible,
+  .form-select:focus-visible {
+    border-color: var(--ring);
+    box-shadow: inset 0 0 0 1px var(--ring);
+  }
+
+  .form-check {
+    display: flex;
+    min-height: 20px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-check-input {
+    appearance: none;
+    display: grid;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    place-items: center;
+    margin: 0;
+    border: 1px solid var(--input);
+    border-radius: 5px;
+    corner-shape: superellipse(1.5);
+    color: var(--primary-foreground);
+    background: var(--secondary);
+    cursor: var(--cursor-interaction, pointer);
+  }
+
+  .form-check-input:checked {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+
+  .form-check-input:checked::after {
+    width: 7px;
+    height: 4px;
+    border-bottom: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    content: "";
+    transform: translateY(-1px) rotate(-45deg);
+  }
+
+  .form-check-input:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .form-check-label {
+    color: var(--foreground);
+  }
+
+  svg.lucide {
+    display: block;
+    width: 16px;
+    height: 16px;
+    flex: none;
+    stroke-width: 1.6;
+  }
+
+  .text-small {
+    font-size: max(11px, calc(var(--font-size-base) - 2px));
+  }
+
+  .text-muted {
+    color: var(--muted-foreground);
+  }
+
+  .text-destructive {
+    color: var(--destructive);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Lead Tracker panel. Uses the host's theme variables from @openai/mcp-extensions styles. */
+:root { --xano: #3b6cf6; --xano-soft: color-mix(in srgb, #3b6cf6 14%, transparent); --ok: #16a34a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif); font-size: 14px; }
+.lt { padding: 16px; display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+.lt-head { display: flex; align-items: center; gap: 12px; }
+.lt-title { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.lt-sub { color: var(--muted-foreground); font-size: 13px; margin-top: 2px; }
+.lt-spacer { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--xano-soft); color: var(--xano); white-space: nowrap; }
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--xano); display: inline-block; }
+.iconbtn { border: 1px solid var(--input); background: transparent; color: var(--foreground); border-radius: 999px; height: 30px; padding: 0 12px; font: inherit; font-size: 13px; cursor: var(--cursor-interaction, pointer); }
+.iconbtn:disabled { opacity: .5; }
+.board { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; }
+.col { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px; min-height: 180px; display: flex; flex-direction: column; gap: 8px; }
+.col-h { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; padding: 2px 2px 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.count { margin-left: auto; color: var(--muted-foreground); font-weight: 500; font-size: 12px; background: var(--muted); border-radius: 999px; padding: 1px 8px; }
+.card { background: var(--background); border: 1px solid var(--border); border-radius: 12px; padding: 10px 11px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 2px rgb(0 0 0 / 5%); transition: border-color .2s; }
+.card.saving { border-style: dashed; }
+.card.just-saved { border-color: color-mix(in srgb, var(--ok) 55%, transparent); }
+.card-top { display: flex; align-items: center; gap: 8px; }
+.av { width: 28px; height: 28px; border-radius: 50%; background: var(--xano-soft); color: var(--xano); font-weight: 600; font-size: 11px; display: grid; place-items: center; flex: none; }
+.nm { font-weight: 600; font-size: 14px; line-height: 1.2; }
+.co { color: var(--muted-foreground); font-size: 12.5px; line-height: 1.2; }
+.val { font-weight: 600; font-variant-numeric: tabular-nums; font-size: 14px; }
+.card-foot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground); }
+.card-foot.ok { color: var(--ok); }
+.card select { margin-left: auto; font: inherit; font-size: 12px; border: 1px solid var(--input); border-radius: 8px; background: var(--background); color: var(--foreground); padding: 2px 4px; cursor: var(--cursor-interaction, pointer); }
+.spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--muted); border-top-color: var(--xano); animation: s .8s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+.empty { grid-column: 1 / -1; text-align: center; color: var(--muted-foreground); padding: 8px 0 0; font-size: 13px; }
+.err { color: var(--destructive); font-size: 12.5px; }
+.foot { color: var(--muted-foreground); font-size: 12px; display: flex; gap: 6px; align-items: center; }
+@media (max-width: 560px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.lt.full { padding: 24px 28px; gap: 18px; }
+.lt.full .lt-title { font-size: 22px; }
+.lt.full .board { gap: 14px; }
+.lt.full .col { min-height: calc(100vh - 140px); padding: 12px; }
+.lt.full .card { padding: 12px 13px; }
+.card.just-saved { animation: pop .6s ease-out; }
+@keyframes pop { 0% { transform: scale(.96); opacity: .4; } 60% { transform: scale(1.02); opacity: 1; } 100% { transform: none; } }
+
+.ok-ico{vertical-align:-2px;margin-right:2px}
+</style></head><body><div id="root"></div><script>(()=>{var b=[{key:"New",color:"#94a3b8"},{key:"Qualified",color:"#38bdf8"},{key:"Proposal",color:"#f59e0b"},{key:"Won",color:"#22c55e"}],n={leads:[],loaded:!1,saving:new Map,savedAt:new Map,lastSaved:-1,refreshing:!1,error:"",mode:"inline"},d=window,f=e=>String(e).replace(/[&<>"']/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[t]),$=e=>"$"+Number(e).toLocaleString("en-US",{maximumFractionDigits:0}),j=e=>String(e).split(/\s+/).filter(Boolean).slice(0,2).map(t=>t[0].toUpperCase()).join(""),S=1,c=new Map,m=e=>window.parent?.postMessage({jsonrpc:"2.0",...e},"*"),M=(e,t)=>new Promise((i,a)=>{let s=S++;c.set(s,r=>r.error?a(new Error(r.error.message||"Host error")):i(r.result)),m({id:s,method:e,params:t}),setTimeout(()=>c.has(s)&&(c.delete(s),a(new Error("Host did not answer"))),2e4)});async function h(e,t){return d.openai?.callTool?d.openai.callTool(e,t):M("tools/call",{name:e,arguments:t})}function C(e){try{d.openai?.setWidgetState?d.openai.setWidgetState({note:e}):m({method:"ui/update-model-context",id:S++,params:{content:[{type:"text",text:e}]}})}catch{}}function k(){let e=Math.ceil(document.getElementById("root").getBoundingClientRect().height);try{d.openai?.notifyIntrinsicHeight?.(e)}catch{}m({method:"ui/notifications/size-changed",params:{width:document.documentElement.clientWidth,height:e}})}window.addEventListener("message",e=>{let t=e.data;if(!(!t||typeof t!="object"||t.jsonrpc!=="2.0")){if(t.id!=null&&c.has(t.id)&&(t.result!==void 0||t.error)){let i=c.get(t.id);c.delete(t.id),i(t);return}t.method==="ui/notifications/tool-result"&&u(t.params),t.method==="ui/notifications/host-context-changed"&&(g(t.params?.theme),t.params?.displayMode&&y(t.params.displayMode))}});function g(e){(e==="dark"||e==="light")&&(document.documentElement.style.colorScheme=e)}function y(e){!e||e===n.mode||(n.mode=e,l())}function p(e){if(e==null)return null;if(typeof e=="string")try{return p(JSON.parse(e))}catch{return null}if(Array.isArray(e.leads))return e;if(e.structuredContent)return p(e.structuredContent);if(Array.isArray(e.content))for(let t of e.content){let i=t?.type==="text"?p(t.text):null;if(i)return i}return e.result?p(e.result):null}function u(e,t=!1){let i=p(e);if(i){if(t&&n.loaded){let a=new Map(n.leads.map(r=>[r.id,r.stage])),s=i.leads.find(r=>!a.has(r.id)||a.get(r.id)!==r.stage);if(!s&&i.leads.length===n.leads.length)return;s&&(n.savedAt.set(s.id,Date.now()),n.lastSaved=s.id)}n.leads=i.leads,n.loaded=!0,i.saved&&i.lead?.id!=null&&(n.savedAt.set(i.lead.id,Date.now()),n.lastSaved=i.lead.id),l()}}function _(e){return n.saving.has(e.id)?`<div class="card-foot"><span class="spin"></span>Saving to ${n.saving.get(e.id)}\u2026</div>`:n.savedAt.get(e.id)&&n.lastSaved===e.id?'<div class="card-foot ok"><svg class="ok-ico" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Saved to Xano</div>':""}function l(){let e=document.getElementById("root"),t=n.leads.reduce((a,s)=>a+Number(s.deal_value||0),0),i=b.map(({key:a,color:s})=>{let r=n.leads.filter(o=>o.stage===a),T=r.map(o=>{let A=n.lastSaved===o.id;return`<div class="card${n.saving.has(o.id)?" saving":""}${A?" just-saved":""}" data-id="${o.id}">
+      <div class="card-top"><div class="av">${f(j(o.name))}</div><div><div class="nm">${f(o.name)}</div><div class="co">${f(o.company)}</div></div></div>
+      <div class="card-top"><div class="val">${$(o.deal_value)}</div>
+        <select aria-label="Stage" data-move="${o.id}" ${n.saving.has(o.id)?"disabled":""}>${b.map(w=>`<option${w.key===(n.saving.get(o.id)??o.stage)?" selected":""}>${w.key}</option>`).join("")}</select></div>
+      ${_(o)}</div>`}).join("");return`<div class="col"><div class="col-h"><span class="dot" style="background:${s}"></span>${a}<span class="count">${r.length}</span></div>${T}</div>`}).join("");e.innerHTML=`<div class="lt${n.mode==="fullscreen"?" full":""}">
+    <div class="lt-head"><div><div class="lt-title">Lead Tracker</div><div class="lt-sub">${n.loaded?`${n.leads.length} lead${n.leads.length===1?"":"s"} \xB7 ${$(t)} pipeline`:"Loading\u2026"}</div></div>
+      <div class="lt-spacer"></div><span class="chip"><i></i>Runs on Xano</span>
+      <button class="iconbtn" id="refresh" ${n.refreshing?"disabled":""}>${n.refreshing?"Refreshing\u2026":"Refresh"}</button></div>
+    <div class="board">${i}</div>
+    ${n.loaded&&!n.leads.length?'<div class="empty">No leads yet. Ask in the chat to add one.</div>':""}
+    ${n.error?`<div class="err">${f(n.error)}</div>`:""}
+  </div>`,e.querySelector("#refresh").onclick=L,e.querySelectorAll("select[data-move]").forEach(a=>{a.onchange=()=>B(Number(a.dataset.move),a.value)}),requestAnimationFrame(k)}var E=e=>(e?.content??[]).map(t=>t.text??"").join(" ")||"Tool error";async function L(){n.refreshing=!0,n.error="",l();try{let e=await h("list_leads",{});if(e?.isError)throw new Error(E(e));u(e)}catch(e){n.error="Couldn't load leads: "+(e?.message??e)}finally{n.refreshing=!1,l()}}async function B(e,t){let i=n.leads.find(a=>a.id===e);if(!(!i||i.stage===t)){n.saving.set(e,t),n.error="",l();try{let a=await h("update_lead_stage",{lead_id:e,stage:t});if(a?.isError)throw new Error(E(a));n.saving.delete(e),u(a),C(`In the Lead Tracker panel the user moved ${i.name} to ${t}. Xano saved it.`)}catch(a){n.saving.delete(e),n.error=`Not saved: ${a?.message??a}`,l()}}}var v=!1;async function q(){if(!(v||document.hidden||n.saving.size||!n.loaded)){v=!0;try{let e=await h("list_leads",{});e?.isError||u(e,!0)}catch{}finally{v=!1}}}setInterval(q,2e3);l();d.openai&&(g(d.openai.theme),d.openai.displayMode&&(n.mode=d.openai.displayMode),u(d.openai.toolOutput),window.addEventListener("openai:set_globals",e=>{let t=e?.detail?.globals??{};"toolOutput"in t&&u(t.toolOutput),"theme"in t&&g(t.theme),"displayMode"in t&&y(t.displayMode)}));M("ui/initialize",{protocolVersion:"2026-01-26",appInfo:{name:"Lead Tracker",version:"1.0.0"},appCapabilities:{availableDisplayModes:["inline","fullscreen"]}}).then(e=>{d.openai||(g(e?.hostContext?.theme),y(e?.hostContext?.displayMode)),m({method:"ui/notifications/initialized",params:{}})}).catch(()=>{});setTimeout(()=>{n.loaded||L()},1500);try{new ResizeObserver(()=>k()).observe(document.getElementById("root"))}catch{}})();
+</script></body></html>

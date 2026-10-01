@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lead Tracker</title>
+<style>
+/* Embedded Tailwind utility subset + tokens — only what this page uses */
+:root{--slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;--slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;--slate-900:#0f172a;--indigo-600:#4f46e5;--indigo-700:#4338ca;--sky-400:#38bdf8;--amber-500:#f59e0b;--green-500:#22c55e;--green-700:#15803d;--red-50:#fef2f2;--red-700:#b91c1c}
+*,::before,::after{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,system-ui,"Segoe UI",sans-serif;background:var(--slate-50);color:var(--slate-900);line-height:1.5}
+input,select,button{font:inherit}
+.hidden{display:none!important}
+.flex{display:flex}.grid{display:grid}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1 1 0%}.flex-wrap{flex-wrap:wrap}
+.gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}
+.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:860px){.grid-cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.grid-cols-4{grid-template-columns:1fr}}
+.max-w-6xl{max-width:72rem}.max-w-md{max-width:28rem}.mx-auto{margin-left:auto;margin-right:auto}.w-full{width:100%}
+.p-3{padding:.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}
+.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-10{margin-top:2.5rem}.mb-2{margin-bottom:.5rem}
+.text-xs{font-size:.75rem}.text-sm{font-size:.875rem}.text-lg{font-size:1.125rem}.text-xl{font-size:1.25rem}.font-semibold{font-weight:600}.font-medium{font-weight:500}
+.text-slate-400{color:var(--slate-400)}.text-slate-500{color:var(--slate-500)}.text-slate-600{color:var(--slate-600)}.text-white{color:#fff}.text-green-700{color:var(--green-700)}.text-red-700{color:var(--red-700)}
+.bg-white{background:#fff}.bg-slate-100{background:var(--slate-100)}.bg-red-50{background:var(--red-50)}.bg-indigo-600{background:var(--indigo-600)}
+.border{border:1px solid var(--slate-200)}.rounded-md{border-radius:.375rem}.rounded-lg{border-radius:.5rem}.rounded-full{border-radius:9999px}
+.shadow-sm{box-shadow:0 1px 2px rgb(0 0 0 / .05)}
+.input{border:1px solid var(--slate-300);border-radius:.375rem;padding:.45rem .65rem;background:#fff;min-width:0}
+.btn{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--slate-300);background:#fff;border-radius:.375rem;padding:.45rem .8rem;cursor:pointer;color:var(--slate-700)}
+.btn:hover{background:var(--slate-100)}.btn:disabled{opacity:.5;cursor:default}
+.btn-primary{background:var(--indigo-600);border-color:var(--indigo-600);color:#fff}.btn-primary:hover{background:var(--indigo-700)}
+.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.dot{width:8px;height:8px;border-radius:9999px;display:inline-block}
+.col{min-height:8rem}
+.card select{border:1px solid var(--slate-200);border-radius:.375rem;padding:.15rem .3rem;background:#fff;font-size:.8rem}
+.flash{outline:2px solid var(--green-500);outline-offset:1px}
+</style>
+</head>
+<body>
+<!-- Setup: the instance base URL (and the API group slug, if the installer didn't fill it in). -->
+<section id="setup" class="hidden max-w-md mx-auto mt-10 p-6 bg-white border rounded-lg shadow-sm">
+  <h1 class="text-xl font-semibold flex items-center gap-2"><span id="logo1"></span>Lead Tracker</h1>
+  <p class="text-sm text-slate-500 mt-1">Connect this board to the Xano workspace you pushed the template to.</p>
+  <label class="text-sm font-medium mt-4 flex" for="baseUrl">Xano instance URL</label>
+  <input id="baseUrl" class="input w-full mt-1" placeholder="https://your-instance.xano.io">
+  <div id="canonWrap" class="hidden">
+    <label class="text-sm font-medium mt-3 flex" for="canon">LeadTracker API group slug</label>
+    <input id="canon" class="input w-full mt-1" placeholder="e.g. y22CWUTL (from api:y22CWUTL)">
+    <p class="text-xs text-slate-500 mt-1">Find it in Xano under API &rarr; LeadTracker; it's the part after <code>api:</code> in the base URL.</p>
+  </div>
+  <p id="setupErr" class="hidden text-sm text-red-700 bg-red-50 p-3 rounded-md mt-3"></p>
+  <button id="saveCfg" class="btn btn-primary mt-4">Connect</button>
+</section>
+
+<!-- The board -->
+<main id="app" class="hidden max-w-6xl mx-auto p-4">
+  <header class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-xl font-semibold flex items-center gap-2"><span id="logo2"></span>Lead Tracker</h1>
+      <p id="summary" class="text-sm text-slate-500">Loading…</p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <button id="seedBtn" class="btn"></button>
+      <button id="refreshBtn" class="btn"></button>
+      <button id="resetBtn" class="btn" title="Change the Xano connection"></button>
+    </div>
+  </header>
+
+  <form id="addForm" class="flex flex-wrap gap-2 mt-4 p-3 bg-white border rounded-lg">
+    <input name="name" class="input flex-1" placeholder="Contact name" required>
+    <input name="company" class="input flex-1" placeholder="Company">
+    <input name="deal_value" class="input" type="number" min="0" step="1" placeholder="Deal value (USD)">
+    <select name="stage" class="input"><option>New</option><option>Qualified</option><option>Proposal</option><option>Won</option></select>
+    <button id="addBtn" class="btn btn-primary" type="submit"></button>
+  </form>
+
+  <p id="err" class="hidden text-sm text-red-700 bg-red-50 p-3 rounded-md mt-3"></p>
+  <div id="board" class="grid grid-cols-4 gap-3 mt-4"></div>
+  <p class="text-xs text-slate-400 mt-6">Changes made from ChatGPT appear here automatically (the board re-reads Xano every 5 seconds).</p>
+</main>
+
+<script>
+// Filled in at install: Xano assigns the LeadTracker group's api:<canonical> slug per workspace.
+// If it's still the placeholder, the setup screen asks for it instead.
+const CANON = '__CANON_LEAD_TRACKER__';
+const STAGES = [
+  { key: 'New', color: 'var(--slate-400)' },
+  { key: 'Qualified', color: 'var(--sky-400)' },
+  { key: 'Proposal', color: 'var(--amber-500)' },
+  { key: 'Won', color: 'var(--green-500)' },
+];
+const LS = { cfg: 'lead-tracker:cfg' };
+
+// Lucide icons (ISC), inlined — no CDN, no icon font
+const ICONS = {
+  kanban: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7v7"/><path d="M12 7v4"/><path d="M16 7v9"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  refresh: '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+};
+const icon = (n) => '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[n] || '') + '</svg>';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const money = (n) => '$' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+// ---------- config + api() ----------
+let cfg = loadCfg();
+function loadCfg() { try { return JSON.parse(localStorage.getItem(LS.cfg)) || {}; } catch { return {}; } }
+function saveCfg(c) { cfg = c; localStorage.setItem(LS.cfg, JSON.stringify(c)); }
+window.clearCfg = function () { localStorage.removeItem(LS.cfg); cfg = {}; route(); };
+const normalizeBase = (u) => (u || '').trim().replace(/\/+$/, '');
+const canonFilled = () => !CANON.startsWith('__CANON');
+const groupPath = () => '/api:' + (canonFilled() ? CANON : cfg.canon);
+
+async function api(path, opts = {}) {
+  const res = await fetch(cfg.baseUrl + groupPath() + path, {
+    ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+  });
+  const body = res.status === 204 ? null : await res.json().catch(() => null);
+  if (!res.ok) throw new Error((body && body.message) || 'Xano returned an error (HTTP ' + res.status + ').');
+  return body;
+}
+
+// ---------- views ----------
+function route() {
+  const ready = cfg.baseUrl && (canonFilled() || cfg.canon);
+  $('setup').classList.toggle('hidden', !!ready);
+  $('app').classList.toggle('hidden', !ready);
+  if (!ready) { $('baseUrl').value = cfg.baseUrl || ''; $('canonWrap').classList.toggle('hidden', canonFilled()); return; }
+  load();
+}
+
+let leads = [], flashId = null, busy = false;
+function showErr(msg) { $('err').textContent = msg || ''; $('err').classList.toggle('hidden', !msg); }
+
+async function load(fromPoll) {
+  if (busy && fromPoll) return;
+  try {
+    const board = await api('/leads');
+    if (fromPoll) {
+      const before = new Map(leads.map((l) => [l.id, l.stage]));
+      const changed = board.leads.find((l) => !before.has(l.id) || before.get(l.id) !== l.stage);
+      if (!changed && board.leads.length === leads.length) return;
+      if (changed) flashId = changed.id;
+    }
+    leads = board.leads; render(board.summary); if (!fromPoll) showErr('');
+  } catch (e) {
+    if (!fromPoll) showErr("Couldn't load leads: " + e.message + ' Check the connection settings.');
+  }
+}
+
+function render(summary) {
+  $('summary').textContent = summary.total_leads + ' lead' + (summary.total_leads === 1 ? '' : 's') + ' · ' + money(summary.open_value) + ' open · ' + money(summary.won_value) + ' won';
+  $('board').innerHTML = STAGES.map(({ key, color }) => {
+    const items = leads.filter((l) => l.stage === key);
+    const b = summary.by_stage[key] || { count: 0, value: 0 };
+    const cards = items.map((l) => `
+      <div class="card bg-white border rounded-lg p-3 mt-2 shadow-sm${l.id === flashId ? ' flash' : ''}">
+        <div class="font-medium">${esc(l.name)}</div>
+        <div class="text-sm text-slate-500">${esc(l.company)}</div>
+        <div class="flex items-center justify-between mt-2">
+          <span class="text-sm font-semibold">${money(l.deal_value)}</span>
+          <select aria-label="Stage for ${esc(l.name)}" data-move="${l.id}">${STAGES.map((s) => `<option${s.key === l.stage ? ' selected' : ''}>${s.key}</option>`).join('')}</select>
+        </div>
+        ${l.id === flashId ? `<div class="text-xs text-green-700 flex items-center gap-1 mt-1">${icon('check')}Saved to Xano</div>` : ''}
+      </div>`).join('');
+    return `<div class="col bg-slate-100 rounded-lg p-3">
+      <div class="flex items-center gap-2 text-sm font-semibold"><span class="dot" style="background:${color}"></span>${key}
+        <span class="text-slate-500 font-medium">${b.count} · ${money(b.value)}</span></div>
+      ${cards || '<p class="text-xs text-slate-400 mt-2">No leads</p>'}</div>`;
+  }).join('');
+  document.querySelectorAll('select[data-move]').forEach((sel) => { sel.onchange = () => move(Number(sel.dataset.move), sel.value); });
+}
+
+// ---------- actions (each maps to a real LeadTracker endpoint) ----------
+async function move(id, stage) {
+  busy = true; showErr('');
+  try { await api('/leads/' + id + '/stage', { method: 'PATCH', body: JSON.stringify({ stage }) }); flashId = id; await load(); }
+  catch (e) { showErr('Not saved: ' + e.message); await load(); }
+  finally { busy = false; }
+}
+
+$('addForm').onsubmit = async (ev) => {
+  ev.preventDefault();
+  const f = new FormData(ev.target);
+  const body = { name: f.get('name'), company: f.get('company'), stage: f.get('stage') };
+  if (f.get('deal_value') !== '') body.deal_value = Number(f.get('deal_value'));
+  busy = true; $('addBtn').disabled = true; showErr('');
+  try { const lead = await api('/leads', { method: 'POST', body: JSON.stringify(body) }); flashId = lead.id; ev.target.reset(); await load(); }
+  catch (e) { showErr('Not saved: ' + e.message); }
+  finally { busy = false; $('addBtn').disabled = false; }
+};
+
+$('seedBtn').onclick = async () => {
+  $('seedBtn').disabled = true; showErr('');
+  try { await api('/seed', { method: 'POST' }); await load(); }
+  catch (e) { showErr("Couldn't load demo data: " + e.message); }
+  finally { $('seedBtn').disabled = false; }
+};
+$('refreshBtn').onclick = () => load();
+$('resetBtn').onclick = () => window.clearCfg();
+
+$('saveCfg').onclick = () => {
+  const baseUrl = normalizeBase($('baseUrl').value);
+  const canon = $('canon').value.trim().replace(/^api:/, '');
+  if (!/^https?:\/\//.test(baseUrl)) { $('setupErr').textContent = 'Enter your instance URL, starting with https://'; $('setupErr').classList.remove('hidden'); return; }
+  if (!canonFilled() && !canon) { $('setupErr').textContent = 'Enter the LeadTracker API group slug.'; $('setupErr').classList.remove('hidden'); return; }
+  $('setupErr').classList.add('hidden');
+  saveCfg({ baseUrl, canon }); route();
+};
+
+// ---------- start ----------
+$('logo1').innerHTML = $('logo2').innerHTML = icon('kanban');
+$('seedBtn').innerHTML = icon('database') + 'Load demo data';
+$('refreshBtn').innerHTML = icon('refresh') + 'Refresh';
+$('resetBtn').innerHTML = icon('settings') + 'Connection';
+$('addBtn').innerHTML = icon('plus') + 'Add lead';
+// Stay in sync with Xano so leads added or moved from ChatGPT show up here.
+setInterval(() => { if (!document.hidden && !$('app').classList.contains('hidden')) load(true); }, 5000);
+route();
+</script>
+</body>
+</html>

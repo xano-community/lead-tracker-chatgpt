@@ -1,0 +1,8 @@
+{
+  "name": "lead-tracker-panel",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": { "@openai/mcp-extensions": "^0.1.0" },
+  "devDependencies": { "esbuild": "^0.25.12" }
+}
