@@ -25,6 +25,7 @@ Browser ──REST──▶ api:LeadTracker  (GET/POST /leads, PATCH /leads/{id}
 - **Interactive panel.** `open_lead_tracker` carries an output template, so ChatGPT renders the board inline as the plugin's interactive panel. Use ChatGPT's "open in tab" control to show it next to the chat; the panel switches to a full-height layout in fullscreen.
 - **Live sync.** The panel re-reads `list_leads` every 2 seconds while visible, and the web board re-reads `GET /leads` every 5 seconds. A lead added or moved from either side shows up on the other, marked "Saved to Xano".
 - **Text-only writes.** `add_lead` and `update_lead_stage` have no output template, so ChatGPT replies in a sentence and the open panel updates itself.
+- **Going further.** The panel uses an output template, rendered inline in the conversation. OpenAI's [Plugin extensions guide](https://developers.openai.com/plugins/build/extensions) covers the other places a plugin can appear (the ChatGPT sidebar, a side panel in the thread, file viewers, and composer mentions). Those are set through each tool's `_meta`, which here is the `tool_meta` on the tool entries in `backend/ai/mcp_server/lead_tracker.xs`. The template doesn't set up those surfaces for you.
 - **Panel hosting.** The `lead_tracker_panel` resource fetches `frontend/panel.html` from `PANEL_URL`. If you don't set it, it uses this repository's public copy on GitHub.
 
 ## Common use cases
